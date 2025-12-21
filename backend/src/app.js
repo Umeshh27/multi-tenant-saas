@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes.js";
 import tenantRoutes from "./routes/tenantRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tenants", tenantRoutes);
 app.use("/api", userRoutes);
 app.use("/api", projectRoutes);
+app.use("/api", taskRoutes);
 
 
 app.use(express.json());

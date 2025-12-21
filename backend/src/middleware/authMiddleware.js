@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
 
-const authMiddleware = (req, res, next) => {
+export const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
       success: false,
-      message: "Authentication token missing",
+      message: "Authorization token missing",
     });
   }
 
@@ -29,5 +29,3 @@ const authMiddleware = (req, res, next) => {
     });
   }
 };
-
-export default authMiddleware;

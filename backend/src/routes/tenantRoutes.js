@@ -1,5 +1,5 @@
 import express from "express";
-import authMiddleware from "../middleware/authMiddleware.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
 import {
   getTenantById,
@@ -9,8 +9,16 @@ import {
 
 const router = express.Router();
 
-router.get("/:tenantId", authMiddleware, getTenantById);
-router.put("/:tenantId", authMiddleware, updateTenant);
-router.get("/", authMiddleware, roleMiddleware(["super_admin"]), listTenants);
+/* Tenant Admin OR Super Admin */
+router.get("/:tenantId", authenticate, getTenantById);
+router.put("/:tenantId", authenticate, updateTenant);
+
+/* Super Admin ONLY */
+router.get(
+  "/",
+  authenticate,
+  roleMiddleware(["super_admin"]),
+  listTenants
+);
 
 export default router;

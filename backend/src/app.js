@@ -8,11 +8,23 @@ import userRoutes from "./routes/userRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import healthRoutes from "./routes/health.js";
+import cors from "cors";
+
 
 
 dotenv.config();
 
 const app = express();
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",   // frontend local
+      "http://frontend:3000"     // docker frontend (future)
+    ],
+    credentials: true
+  })
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tenants", tenantRoutes);
@@ -20,7 +32,6 @@ app.use("/api", userRoutes);
 app.use("/api", projectRoutes);
 app.use("/api", taskRoutes);
 app.use("/api", healthRoutes);
-
 
 app.use(express.json());
 app.use(

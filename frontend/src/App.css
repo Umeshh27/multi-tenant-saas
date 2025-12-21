@@ -123,32 +123,3 @@ a:hover {
 .logout-btn:hover {
   background-color: #c0392b;
 }
-
-/* ---------- LOGIN PAGE ---------- */
-.login {
-  max-width: 400px;
-  margin: 100px auto;
-  padding: 35px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-}
-
-.login h2 {
-  margin-bottom: 30px;
-  font-size: 24px;
-  color: #2c3e50;
-}
-
-.login form {
-  display: flex;
-  flex-direction: column;
-}
-
-.login input {
-  margin-bottom: 20px;
-}
-
-.login button {
-  margin-top: 10px;
-}

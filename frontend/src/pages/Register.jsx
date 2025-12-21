@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 function Register() {
   const navigate = useNavigate();
+  const [acceptTerms, setAcceptTerms] = useState(false);
+
   const [form, setForm] = useState({
     tenantName: "",
     subdomain: "",
@@ -48,7 +50,7 @@ function Register() {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>Tenant Registration</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -66,7 +68,7 @@ function Register() {
         <input name="adminFullName" placeholder="Admin Full Name" onChange={handleChange} required />
         <br />
 
-        <input name="adminPassword" type="password" placeholder="Password" onChange={handleChange} required />
+        <input name="adminPassword" type="password" placeholder="Password" maxLength={20} minLength={8} onChange={handleChange} required />
         <br />
 
         <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} required />

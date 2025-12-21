@@ -11,12 +11,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
+    <div className="dashboard">
       <h2>Dashboard</h2>
       <p>Welcome, {user.full_name}</p>
       <p>Role: {user.role}</p>
 
-      <button onClick={handleLogout}>Logout</button>
+      <button className="logout-btn" onClick={handleLogout}>Logout</button>
     </div>
   );
 }

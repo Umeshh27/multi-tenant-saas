@@ -1,5 +1,6 @@
 import express from "express";
-import {authenticate} from "../middleware/authMiddleware.js";
+import { authenticate } from "../middleware/authMiddleware.js";
+import roleMiddleware from "../middleware/roleMiddleware.js";
 import {
   addUser,
   listUsers,
@@ -9,9 +10,34 @@ import {
 
 const router = express.Router();
 
-router.post("/tenants/:tenantId/users", authMiddleware, addUser);
-router.get("/tenants/:tenantId/users", authMiddleware, listUsers);
-router.put("/users/:userId", authMiddleware, updateUser);
-router.delete("/users/:userId", authMiddleware, deleteUser);
+/* Tenant Admin ONLY */
+router.post(
+  "/tenants/:tenantId/users",
+  authenticate,
+  roleMiddleware(["tenant_admin"]),
+  addUser
+);
+
+/* Tenant Members */
+router.get(
+  "/tenants/:tenantId/users",
+  authenticate,
+  listUsers
+);
+
+/* Tenant Admin OR Self */
+router.put(
+  "/users/:userId",
+  authenticate,
+  updateUser
+);
+
+/* Tenant Admin ONLY */
+router.delete(
+  "/users/:userId",
+  authenticate,
+  roleMiddleware(["tenant_admin"]),
+  deleteUser
+);
 
 export default router;

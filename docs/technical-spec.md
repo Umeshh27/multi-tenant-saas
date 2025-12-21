@@ -100,7 +100,7 @@ DB_NAME=saas_db
 DB_USER=postgres
 DB_PASSWORD=postgres
 
-JWT_SECRET=your_jwt_secret_key_min_32_chars
+JWT_SECRET=dev_secret_key_12345678901234567890
 JWT_EXPIRES_IN=24h
 
 PORT=5000

@@ -14,51 +14,70 @@ export const registerTenant = async (req, res) => {
     adminFullName,
   } = req.body;
 
-  try {
-    const client = await pool.connect();
-
-    try {
-      await client.query("BEGIN");
-
-      const tenantResult = await client.query(
-        `INSERT INTO tenants (name, subdomain)
-         VALUES ($1, $2)
-         RETURNING id`,
-        [tenantName, subdomain]
-      );
-
-      const tenantId = tenantResult.rows[0].id;
-      const passwordHash = await bcrypt.hash(adminPassword, 10);
-
-      const userResult = await client.query(
-        `INSERT INTO users (tenant_id, email, password_hash, full_name, role)
-         VALUES ($1, $2, $3, $4, 'tenant_admin')
-         RETURNING id, email, full_name, role`,
-        [tenantId, adminEmail, passwordHash, adminFullName]
-      );
-
-      await client.query("COMMIT");
-
-      return res.status(201).json({
-        success: true,
-        message: "Tenant registered successfully",
-        data: {
-          tenantId,
-          subdomain,
-          adminUser: userResult.rows[0],
-        },
-      });
-    } catch (err) {
-      await client.query("ROLLBACK");
-      throw err;
-    } finally {
-      client.release();
-    }
-  } catch (error) {
+  // ✅ BASIC VALIDATION
+  if (
+    !tenantName ||
+    !subdomain ||
+    !adminEmail ||
+    !adminPassword ||
+    !adminFullName
+  ) {
     return res.status(400).json({
       success: false,
-      message: "Tenant registration failed",
+      message: "All fields are required",
     });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // ✅ CREATE TENANT WITH DEFAULT FREE PLAN
+    const tenantResult = await client.query(
+      `INSERT INTO tenants 
+       (name, subdomain, status, subscription_plan, max_users, max_projects)
+       VALUES ($1, $2, 'active', 'free', 5, 3)
+       RETURNING id, subdomain`,
+      [tenantName, subdomain]
+    );
+
+    const tenantId = tenantResult.rows[0].id;
+
+    // ✅ HASH PASSWORD
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
+
+    // ✅ CREATE TENANT ADMIN USER
+    const userResult = await client.query(
+      `INSERT INTO users 
+       (tenant_id, email, password_hash, full_name, role)
+       VALUES ($1, $2, $3, $4, 'tenant_admin')
+       RETURNING id, email, full_name, role`,
+      [tenantId, adminEmail, passwordHash, adminFullName]
+    );
+
+    await client.query("COMMIT");
+
+    return res.status(201).json({
+      success: true,
+      message: "Tenant registered successfully",
+      data: {
+        tenantId,
+        subdomain,
+        adminUser: userResult.rows[0],
+      },
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    console.error("REGISTER TENANT ERROR:", error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  } finally {
+    client.release();
   }
 };
 
@@ -91,7 +110,7 @@ export const login = async (req, res) => {
     }
 
     const userResult = await pool.query(
-      `SELECT * FROM users
+      `SELECT * FROM users 
        WHERE email = $1 AND tenant_id = $2 AND is_active = true`,
       [email, tenant.id]
     );
@@ -143,48 +162,4 @@ export const login = async (req, res) => {
       message: "Login failed",
     });
   }
-};
-
-/* ===============================
-   GET CURRENT USER
-================================ */
-export const getMe = async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT u.id, u.email, u.full_name, u.role, u.is_active,
-              t.id AS tenant_id, t.name, t.subdomain, t.subscription_plan,
-              t.max_users, t.max_projects
-       FROM users u
-       LEFT JOIN tenants t ON u.tenant_id = t.id
-       WHERE u.id = $1`,
-      [req.user.userId]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: result.rows[0],
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch user",
-    });
-  }
-};
-
-/* ===============================
-   LOGOUT
-================================ */
-export const logout = async (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Logged out successfully",
-  });
 };

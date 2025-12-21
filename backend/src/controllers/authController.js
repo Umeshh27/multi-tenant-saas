@@ -163,3 +163,56 @@ export const login = async (req, res) => {
     });
   }
 };
+
+/* ===============================
+   GET CURRENT USER
+================================ */
+export const getMe = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+         u.id,
+         u.email,
+         u.full_name,
+         u.role,
+         u.is_active,
+         t.id AS tenant_id,
+         t.name,
+         t.subdomain,
+         t.subscription_plan,
+         t.max_users,
+         t.max_projects
+       FROM users u
+       LEFT JOIN tenants t ON u.tenant_id = t.id
+       WHERE u.id = $1`,
+      [req.user.userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch user",
+    });
+  }
+};
+
+/* ===============================
+   LOGOUT
+================================ */
+export const logout = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};

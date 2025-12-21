@@ -5,13 +5,13 @@ import {
   getMe,
   logout,
 } from "../controllers/authController.js";
-import authMiddleware from "../middleware/authMiddleware.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/register-tenant", registerTenant);
 router.post("/login", login);
-router.get("/me", authMiddleware, getMe);
-router.post("/logout", authMiddleware, logout);
+router.get("/me", authenticate, getMe);
+router.post("/logout", authenticate, logout);
 
 export default router;

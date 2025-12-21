@@ -8,49 +8,67 @@ import tenantRoutes from "./routes/tenantRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
-import healthRoutes from "./routes/health.js";
 
 dotenv.config();
 
 const app = express();
 
-/* =======================
-   GLOBAL MIDDLEWARE
-======================= */
+/* ===============================
+   MIDDLEWARE (ORDER IS CRITICAL)
+================================ */
 
-// ✅ CORS — ALLOW FRONTEND
+// JSON parser MUST come first
+app.use(express.json());
+
+// CORS (ONLY ONCE)
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "http://frontend:3000"
+      "http://frontend:3000",
     ],
     credentials: true,
   })
 );
 
-// ✅ BODY PARSER (MUST BE BEFORE ROUTES)
-app.use(express.json());
-
-/* =======================
+/* ===============================
    ROUTES
-======================= */
+================================ */
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tenants", tenantRoutes);
 app.use("/api", userRoutes);
 app.use("/api", projectRoutes);
 app.use("/api", taskRoutes);
-app.use("/api", healthRoutes);
 
-/* =======================
-   SERVER START
-======================= */
+/* ===============================
+   HEALTH CHECK
+================================ */
+
+app.get("/api/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.status(200).json({
+      status: "ok",
+      database: "connected",
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      database: "disconnected",
+    });
+  }
+});
+
+/* ===============================
+   SERVER
+================================ */
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// 🚨 THIS IS IMPORTANT FOR DOCKER
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend running on port ${PORT}`);
 });
 
 export default app;

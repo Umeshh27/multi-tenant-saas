@@ -3,12 +3,15 @@ import cors from "cors";
 import dotenv from "dotenv";
 import pool from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import tenantRoutes from "./routes/tenantRoutes.js";
+
 
 dotenv.config();
 
 const app = express();
 
 app.use("/api/auth", authRoutes);
+app.use("/api/tenants", tenantRoutes);
 
 
 app.use(express.json());

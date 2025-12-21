@@ -7,6 +7,7 @@ import tenantRoutes from "./routes/tenantRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
+import healthRoutes from "./routes/health.js";
 
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use("/api/tenants", tenantRoutes);
 app.use("/api", userRoutes);
 app.use("/api", projectRoutes);
 app.use("/api", taskRoutes);
+app.use("/api", healthRoutes);
 
 
 app.use(express.json());

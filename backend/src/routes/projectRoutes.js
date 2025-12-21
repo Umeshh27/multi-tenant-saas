@@ -9,9 +9,9 @@ import {
 
 const router = express.Router();
 
-router.post("/projects", authMiddleware, createProject);
-router.get("/projects", authMiddleware, listProjects);
-router.put("/projects/:projectId", authMiddleware, updateProject);
-router.delete("/projects/:projectId", authMiddleware, deleteProject);
+router.post("/projects", authenticate, createProject);
+router.get("/projects", authenticate, listProjects);
+router.put("/projects/:projectId", authenticate, updateProject);
+router.delete("/projects/:projectId", authenticate, deleteProject);
 
 export default router;

@@ -9,9 +9,9 @@ import {
 
 const router = express.Router();
 
-router.post("/projects/:projectId/tasks", authMiddleware, createTask);
-router.get("/projects/:projectId/tasks", authMiddleware, listProjectTasks);
-router.patch("/tasks/:taskId/status", authMiddleware, updateTaskStatus);
-router.put("/tasks/:taskId", authMiddleware, updateTask);
+router.post("/projects/:projectId/tasks", authenticate, createTask);
+router.get("/projects/:projectId/tasks", authenticate, listProjectTasks);
+router.patch("/tasks/:taskId/status", authenticate, updateTaskStatus);
+router.put("/tasks/:taskId", authenticate, updateTask);
 
 export default router;

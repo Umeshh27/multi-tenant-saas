@@ -5,6 +5,7 @@ import pool from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import tenantRoutes from "./routes/tenantRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import projectRoutes from "./routes/projectRoutes.js";
 
 
 dotenv.config();
@@ -14,6 +15,7 @@ const app = express();
 app.use("/api/auth", authRoutes);
 app.use("/api/tenants", tenantRoutes);
 app.use("/api", userRoutes);
+app.use("/api", projectRoutes);
 
 
 app.use(express.json());

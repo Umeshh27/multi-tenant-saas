@@ -33,7 +33,7 @@ services:
       JWT_SECRET: test_jwt_secret_key_123456789012345
       JWT_EXPIRES_IN: 24h
 
-      FRONTEND_URL: http://frontend:3000
+      FRONTEND_URL: http://localhost:3000
       NODE_ENV: development
     depends_on:
       database:

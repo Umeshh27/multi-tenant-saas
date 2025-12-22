@@ -1,22 +1,25 @@
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function Dashboard() {
+function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
   return (
     <div className="dashboard">
       <h2>Dashboard</h2>
-      <p>Welcome, {user.full_name}</p>
-      <p>Role: {user.role}</p>
+      <p>Welcome {user?.full_name}</p>
 
-      <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      <button className="logout-btn" onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
 }
+
+export default Dashboard;

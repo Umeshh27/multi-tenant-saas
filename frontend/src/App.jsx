@@ -1,30 +1,24 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-function App() {
-  const { user, loading } = useAuth();
+function AppRoutes() {
+  const { loading } = useAuth();
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return <div style={{ textAlign: "center" }}>Loading app...</div>;
+  }
 
   return (
     <Routes>
-      {/* Default route */}
-      <Route
-        path="/"
-        element={
-          user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
-        }
-      />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Public routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected route */}
       <Route
         path="/dashboard"
         element={
@@ -33,8 +27,18 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

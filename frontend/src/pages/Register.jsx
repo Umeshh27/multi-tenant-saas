@@ -14,6 +14,7 @@ function Register() {
     adminPassword: "",
     confirmPassword: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -30,6 +31,11 @@ function Register() {
       return;
     }
 
+    if (!acceptTerms) {
+      setError("You must accept Terms & Conditions");
+      return;
+    }
+
     try {
       setLoading(true);
       await api.post("/auth/register-tenant", {
@@ -40,7 +46,6 @@ function Register() {
         adminFullName: form.adminFullName,
       });
 
-      alert("Tenant registered successfully. Please login.");
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
@@ -51,28 +56,21 @@ function Register() {
 
   return (
     <div className="container">
-      <h2>Tenant Registration</h2>
+      <h2>Register Tenant</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
 
       <form onSubmit={handleSubmit}>
         <input name="tenantName" placeholder="Organization Name" onChange={handleChange} required />
-        <br />
-
         <input name="subdomain" placeholder="Subdomain" onChange={handleChange} required />
-        <br />
-
         <input name="adminEmail" type="email" placeholder="Admin Email" onChange={handleChange} required />
-        <br />
-
         <input name="adminFullName" placeholder="Admin Full Name" onChange={handleChange} required />
-        <br />
-
-        <input name="adminPassword" type="password" placeholder="Password" maxLength={20} minLength={8} onChange={handleChange} required />
-        <br />
-
+        <input name="adminPassword" type="password" minLength={8} maxLength={20} placeholder="Password" onChange={handleChange} required />
         <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} required />
-        <br />
+
+        <label>
+          <input type="checkbox" onChange={(e) => setAcceptTerms(e.target.checked)} /> I accept Terms
+        </label>
 
         <button disabled={loading}>
           {loading ? "Registering..." : "Register"}

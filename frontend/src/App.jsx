@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import Users from "./pages/Users";
 
 function AppRoutes() {
   const { loading } = useAuth();
@@ -42,3 +43,7 @@ export default function App() {
     </AuthProvider>
   );
 }
+
+
+
+

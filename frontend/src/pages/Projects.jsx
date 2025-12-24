@@ -3,7 +3,7 @@ import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
 
 function Projects() {
-  const { user, loading, isTenantAdmin } = useAuth();
+  const { loading, isTenantAdmin } = useAuth();
 
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState("");
@@ -34,7 +34,7 @@ function Projects() {
   }, [loading]);
 
   /* =========================
-     ADD PROJECT
+     ADD PROJECT (FIXED)
   ========================= */
   const handleAddProject = async (e) => {
     e.preventDefault();
@@ -47,6 +47,7 @@ function Projects() {
       });
 
       const newProject = res.data?.data;
+
       if (newProject) {
         setProjects((prev) => [...prev, newProject]);
       }
@@ -59,14 +60,17 @@ function Projects() {
   };
 
   /* =========================
-     DELETE PROJECT
+     DELETE PROJECT (FIXED)
   ========================= */
-  const handleDelete = async (projectId) => {
+  const handleDeleteProject = async (projectId) => {
     if (!window.confirm("Delete this project?")) return;
 
     try {
       await api.delete(`/projects/${projectId}`);
-      setProjects((prev) => prev.filter((p) => p.id !== projectId));
+
+      setProjects((prev) =>
+        prev.filter((project) => project.id !== projectId)
+      );
     } catch (err) {
       alert(err.response?.data?.message || "Delete failed");
     }
@@ -78,9 +82,8 @@ function Projects() {
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* ================= ADD PROJECT ================= */}
       {isTenantAdmin() && (
-        <form onSubmit={handleAddProject} style={{ marginBottom: "20px" }}>
+        <form onSubmit={handleAddProject}>
           <h4>Create Project</h4>
 
           <input
@@ -100,17 +103,17 @@ function Projects() {
         </form>
       )}
 
-      {/* ================= PROJECTS TABLE ================= */}
+      <hr />
+
       {projects.length === 0 ? (
         <p>No projects found</p>
       ) : (
-        <table border="1" cellPadding="8" width="100%">
+        <table border="1" cellPadding="8">
           <thead>
             <tr>
               <th>Name</th>
               <th>Description</th>
               <th>Status</th>
-              <th>Created At</th>
               {isTenantAdmin() && <th>Action</th>}
             </tr>
           </thead>
@@ -121,11 +124,10 @@ function Projects() {
                 <td>{p.name}</td>
                 <td>{p.description || "-"}</td>
                 <td>{p.status}</td>
-                <td>{new Date(p.created_at).toLocaleDateString()}</td>
 
                 {isTenantAdmin() && (
                   <td>
-                    <button onClick={() => handleDelete(p.id)}>
+                    <button onClick={() => handleDeleteProject(p.id)}>
                       Delete
                     </button>
                   </td>

@@ -8,19 +8,26 @@ function ProjectDetails() {
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
+  const [error, setError] = useState("");
 
   /* LOAD PROJECT */
   useEffect(() => {
     api
       .get(`/projects/${projectId}`)
-      .then((res) => setProject(res.data.data));
+      .then((res) => {
+        setProject(res.data.data);
+      })
+      .catch(() => setError("Project not found"));
   }, [projectId]);
 
   /* LOAD TASKS */
   useEffect(() => {
     api
       .get(`/projects/${projectId}/tasks`)
-      .then((res) => setTasks(res.data.data.tasks || []));
+      .then((res) => {
+        setTasks(res.data.data.tasks || []);
+      })
+      .catch(() => setTasks([]));
   }, [projectId]);
 
   /* ADD TASK */
@@ -35,23 +42,13 @@ function ProjectDetails() {
     setTitle("");
   };
 
-  /* UPDATE STATUS */
-  const updateStatus = async (id, status) => {
-    await api.patch(`/tasks/${id}/status`, { status });
-
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, status } : t
-      )
-    );
-  };
-
+  if (error) return <p>{error}</p>;
   if (!project) return <p>Loading project...</p>;
 
   return (
     <div>
       <h2>{project.name}</h2>
-      <p>{project.description}</p>
+      <p>{project.description || "No description"}</p>
 
       <hr />
 
@@ -74,17 +71,6 @@ function ProjectDetails() {
           {tasks.map((t) => (
             <li key={t.id}>
               {t.title} — {t.status}
-
-              <select
-                value={t.status}
-                onChange={(e) =>
-                  updateStatus(t.id, e.target.value)
-                }
-              >
-                <option value="todo">Todo</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-              </select>
             </li>
           ))}
         </ul>

@@ -7,17 +7,22 @@ import auditLog from "../utils/auditLogger.js";
 ================================ */
 export const addUser = async (req, res) => {
   const { tenantId } = req.params;
-  const { email, password, fullName, role = "user" } = req.body;
+  const { email, fullName, role = "user" } = req.body;
   const currentUser = req.user;
 
   try {
-    if (currentUser.role !== "tenant_admin" || currentUser.tenantId !== tenantId) {
+    // 🔐 Authorization
+    if (
+      currentUser.role !== "tenant_admin" ||
+      currentUser.tenantId !== tenantId
+    ) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized",
       });
     }
 
+    // 🔢 Subscription limit
     const tenantResult = await pool.query(
       "SELECT max_users FROM tenants WHERE id = $1",
       [tenantId]
@@ -28,22 +33,30 @@ export const addUser = async (req, res) => {
       [tenantId]
     );
 
-    if (Number(userCountResult.rows[0].count) >= tenantResult.rows[0].max_users) {
+    if (
+      Number(userCountResult.rows[0].count) >=
+      tenantResult.rows[0].max_users
+    ) {
       return res.status(403).json({
         success: false,
         message: "Subscription limit reached",
       });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    // 🔑 Generate temporary password
+    const tempPassword = "User@123";
+    const passwordHash = await bcrypt.hash(tempPassword, 10);
 
+    // 👤 Create user
     const result = await pool.query(
-      `INSERT INTO users (tenant_id, email, password_hash, full_name, role)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users 
+       (tenant_id, email, password_hash, full_name, role) 
+       VALUES ($1, $2, $3, $4, $5) 
        RETURNING id, email, full_name, role, is_active, created_at`,
       [tenantId, email, passwordHash, fullName, role]
     );
 
+    // 📝 Audit log
     await auditLog({
       tenantId,
       userId: currentUser.userId,
@@ -59,6 +72,8 @@ export const addUser = async (req, res) => {
       data: result.rows[0],
     });
   } catch (error) {
+    console.error("ADD USER ERROR:", error.message);
+
     if (error.code === "23505") {
       return res.status(409).json({
         success: false,
@@ -72,6 +87,7 @@ export const addUser = async (req, res) => {
     });
   }
 };
+
 
 /* ===============================
    LIST TENANT USERS (API 9)

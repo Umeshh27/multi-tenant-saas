@@ -28,13 +28,23 @@ function Login() {
     try {
       setLoading(true);
 
-      const res = await api.post("/auth/login", form);
+      // 1️⃣ LOGIN
+      const loginRes = await api.post("/auth/login", form);
+      const token = loginRes.data.data.token;
 
-      // ✅ IMPORTANT: update AuthContext immediately
-      login(res.data.data.token, res.data.data.user);
+      // 2️⃣ FETCH FULL USER (TENANT + PLAN)
+      const meRes = await api.get("/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      // ✅ redirect after context update
+      // 3️⃣ SET CONTEXT
+      login(token, meRes.data.data);
+
+      // 4️⃣ NAVIGATE
       navigate("/dashboard", { replace: true });
+
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
@@ -56,7 +66,6 @@ function Login() {
           onChange={handleChange}
           required
         />
-        <br />
 
         <input
           name="password"
@@ -65,7 +74,6 @@ function Login() {
           onChange={handleChange}
           required
         />
-        <br />
 
         <input
           name="tenantSubdomain"
@@ -73,7 +81,6 @@ function Login() {
           onChange={handleChange}
           required
         />
-        <br />
 
         <button disabled={loading}>
           {loading ? "Logging in..." : "Login"}

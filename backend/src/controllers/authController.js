@@ -110,7 +110,7 @@ export const login = async (req, res) => {
     }
 
     const userResult = await pool.query(
-      `SELECT * FROM users 
+      `SELECT * FROM users
        WHERE email = $1 AND tenant_id = $2 AND is_active = true`,
       [email, tenant.id]
     );
@@ -142,21 +142,22 @@ export const login = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
+    // ✅ IMPORTANT FIX: snake_case fields
     return res.status(200).json({
       success: true,
       data: {
         user: {
           id: user.id,
           email: user.email,
-          fullName: user.full_name,
+          full_name: user.full_name,
           role: user.role,
-          tenantId: user.tenant_id,
+          tenant_id: user.tenant_id,
         },
         token,
-        expiresIn: 86400,
       },
     });
   } catch (error) {
+    console.error("LOGIN ERROR:", error.message);
     return res.status(500).json({
       success: false,
       message: "Login failed",

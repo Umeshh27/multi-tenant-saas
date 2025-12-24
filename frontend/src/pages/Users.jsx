@@ -1,79 +1,110 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import AddUserModal from "../components/AddUserModal";
 
 function Users() {
-  const { user, isTenantAdmin, loading } = useAuth();
-  const navigate = useNavigate();
+  const { user, loading, isTenantAdmin } = useAuth();
+  const [users, setUsers] = useState([]); // ✅ always array
+  const [error, setError] = useState("");
 
-  const [users, setUsers] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-
-  const fetchUsers = () => {
-    api
-      .get(`/tenants/${user.tenant_id}/users`)
-      .then((res) => setUsers(res.data.data.users))
-      .catch(() => alert("Failed to load users"));
-  };
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState("user");
 
   useEffect(() => {
-    // ⛔ wait until auth check completes
     if (loading) return;
+    if (!user?.tenant_id) return;
 
-    // ⛔ user not logged in
-    if (!user) {
-      navigate("/login");
-      return;
+    api
+      .get(`/tenants/${user.tenant_id}/users`)
+      .then((res) => {
+        // ✅ NORMALIZE RESPONSE
+        const data = res.data?.data;
+
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else if (Array.isArray(data?.users)) {
+          setUsers(data.users);
+        } else {
+          setUsers([]);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Failed to load users");
+        setUsers([]);
+      });
+  }, [user, loading]);
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const res = await api.post(
+        `/tenants/${user.tenant_id}/users`,
+        { email, fullName, role }
+      );
+
+      const newUser = res.data?.data;
+
+      if (newUser) {
+        setUsers((prev) => [...prev, newUser]);
+      }
+
+      setEmail("");
+      setFullName("");
+      setRole("user");
+    } catch {
+      setError("Failed to add user");
     }
-
-    // ⛔ logged in but not admin
-    if (!isTenantAdmin) {
-      navigate("/dashboard");
-      return;
-    }
-
-    // ✅ allowed
-    fetchUsers();
-  }, [loading, user, isTenantAdmin]);
-
-  if (loading) return <p>Loading users...</p>;
+  };
 
   return (
-    <div className="container">
+    <div>
       <h2>Users</h2>
 
-      <button onClick={() => setShowModal(true)}>+ Add User</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <table border="1" width="100%">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+      {isTenantAdmin() && (
+        <form onSubmit={handleAddUser}>
+          <h4>Add User</h4>
 
-        <tbody>
+          <input
+            placeholder="Full Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+          />
+
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <select value={role} onChange={(e) => setRole(e.target.value)}>
+            <option value="user">User</option>
+            <option value="tenant_admin">Tenant Admin</option>
+          </select>
+
+          <button type="submit">Add User</button>
+        </form>
+      )}
+
+      <hr />
+
+      {users.length === 0 ? (
+        <p>No users found</p>
+      ) : (
+        <ul>
           {users.map((u) => (
-            <tr key={u.id}>
-              <td>{u.full_name}</td>
-              <td>{u.email}</td>
-              <td>{u.role}</td>
-              <td>{u.is_active ? "Active" : "Inactive"}</td>
-            </tr>
+            <li key={u.id}>
+              {u.full_name} ({u.email}) – {u.role}
+            </li>
           ))}
-        </tbody>
-      </table>
-
-      {showModal && (
-        <AddUserModal
-          tenantId={user.tenant_id}
-          onClose={() => setShowModal(false)}
-          onUserAdded={fetchUsers}
-        />
+        </ul>
       )}
     </div>
   );

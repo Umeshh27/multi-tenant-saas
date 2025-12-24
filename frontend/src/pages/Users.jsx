@@ -5,30 +5,38 @@ import { useNavigate } from "react-router-dom";
 import AddUserModal from "../components/AddUserModal";
 
 function Users() {
-  const { user, isTenantAdmin } = useAuth();
+  const { user, isTenantAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
   const fetchUsers = () => {
-    setLoading(true);
     api
       .get(`/tenants/${user.tenant_id}/users`)
       .then((res) => setUsers(res.data.data.users))
-      .catch(() => alert("Failed to load users"))
-      .finally(() => setLoading(false));
+      .catch(() => alert("Failed to load users"));
   };
 
   useEffect(() => {
+    // ⛔ wait until auth check completes
+    if (loading) return;
+
+    // ⛔ user not logged in
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    // ⛔ logged in but not admin
     if (!isTenantAdmin) {
       navigate("/dashboard");
       return;
     }
 
+    // ✅ allowed
     fetchUsers();
-  }, []);
+  }, [loading, user, isTenantAdmin]);
 
   if (loading) return <p>Loading users...</p>;
 
@@ -36,9 +44,7 @@ function Users() {
     <div className="container">
       <h2>Users</h2>
 
-      <button onClick={() => setShowModal(true)}>
-        + Add User
-      </button>
+      <button onClick={() => setShowModal(true)}>+ Add User</button>
 
       <table border="1" width="100%">
         <thead>

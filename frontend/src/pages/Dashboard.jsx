@@ -16,6 +16,8 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  console.log("DASHBOARD USER:", user);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -81,7 +83,7 @@ function Dashboard() {
 
       <div style={{ marginBottom: "20px", padding: "15px", background: "#f5f5f5", borderRadius: "8px" }}>
         <p><b>Welcome, {user?.full_name}</b></p>
-        <p>Organization: {user?.tenant_id} (Plan: {user?.role})</p>
+        <p>Organization: {user?.tenant_name || user?.name || user?.tenant_id} (Plan: <span style={{ textTransform: "capitalize" }}>{user?.subscription_plan || "Free"}</span>)</p>
       </div>
 
       <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px", marginBottom: "30px" }}>

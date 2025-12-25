@@ -89,7 +89,7 @@ export const login = async (req, res) => {
 
   try {
     const tenantResult = await pool.query(
-      "SELECT id, status FROM tenants WHERE subdomain = $1",
+      "SELECT id, name, status, subscription_plan FROM tenants WHERE subdomain = $1",
       [tenantSubdomain]
     );
 
@@ -152,6 +152,9 @@ export const login = async (req, res) => {
           full_name: user.full_name,
           role: user.role,
           tenant_id: user.tenant_id,
+          // Include tenant details for frontend display
+          tenant_name: tenant.name || tenantResult.rows[0].name, // Ensure we select name in the tenant query above if not already
+          subscription_plan: tenant.subscription_plan || tenantResult.rows[0].subscription_plan,
         },
         token,
       },
@@ -178,7 +181,7 @@ export const getMe = async (req, res) => {
          u.role,
          u.is_active,
          t.id AS tenant_id,
-         t.name,
+         t.name AS tenant_name,
          t.subdomain,
          t.subscription_plan,
          t.max_users,

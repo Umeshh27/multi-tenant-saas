@@ -67,6 +67,7 @@ export const createTask = async (req, res) => {
       data: result.rows[0],
     });
   } catch (error) {
+    console.error("Create Task Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to create task",
@@ -145,6 +146,7 @@ export const listProjectTasks = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("List Tasks Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch tasks",
@@ -198,9 +200,11 @@ export const updateTaskStatus = async (req, res) => {
       data: result.rows[0],
     });
   } catch (error) {
+    console.error("Update Status Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to update task status",
+      error: error.message // Sending error to client for faster debugging (dev only)
     });
   }
 };
@@ -304,9 +308,58 @@ export const updateTask = async (req, res) => {
       data: result.rows[0],
     });
   } catch (error) {
+    console.error("Update Task Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to update task",
+    });
+  }
+};
+
+/* ===============================
+   DELETE TASK (API 20)
+================================ */
+export const deleteTask = async (req, res) => {
+  const { taskId } = req.params;
+  const { tenantId, userId } = req.user;
+  console.log(`[DELETE TASK] Request received for taskId: ${taskId} by user: ${userId}`);
+
+  try {
+    const taskResult = await pool.query(
+      "SELECT tenant_id FROM tasks WHERE id = $1",
+      [taskId]
+    );
+
+    if (
+      taskResult.rowCount === 0 ||
+      taskResult.rows[0].tenant_id !== tenantId
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized: Task not found or does not belong to your tenant",
+      });
+    }
+
+    await pool.query("DELETE FROM tasks WHERE id = $1", [taskId]);
+
+    await auditLog({
+      tenantId,
+      userId,
+      action: "DELETE_TASK",
+      entityType: "task",
+      entityId: taskId,
+      ipAddress: req.ip,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Task deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete Task Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete task",
     });
   }
 };

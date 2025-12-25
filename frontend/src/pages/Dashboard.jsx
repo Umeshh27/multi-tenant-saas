@@ -72,59 +72,65 @@ function Dashboard() {
     navigate("/login", { replace: true });
   };
 
-  if (loading) return <div className="p-4">Loading dashboard...</div>;
+  if (loading) return <div className="container">Loading...</div>;
 
   return (
-    <div className="dashboard-container" style={{ padding: "20px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h2>Dashboard</h2>
-        <button onClick={handleLogout} style={{ padding: "8px 16px", background: "#f44336", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>Logout</button>
+    <div className="dashboard-container">
+      <div className="page-header">
+        {/* LOGO OR BRANDING COULD GO HERE */}
+        <div></div>
+        <button onClick={handleLogout} className="btn-secondary">Logout</button>
       </div>
 
-      <div style={{ marginBottom: "20px", padding: "15px", background: "#f5f5f5", borderRadius: "8px" }}>
-        <p><b>Welcome, {user?.full_name}</b></p>
-        <p>Organization: {user?.tenant_name || user?.name || user?.tenant_id} (Plan: <span style={{ textTransform: "capitalize" }}>{user?.subscription_plan || "Free"}</span>)</p>
+      <div className="welcome-banner">
+        <h1>Welcome back, {user?.full_name}</h1>
+        <p>
+          Organization: <strong>{user?.tenant_name || user?.name || user?.tenant_id}</strong> •
+          Plan: <span style={{ textTransform: "capitalize", background: "rgba(255,255,255,0.2)", padding: "2px 8px", borderRadius: "12px", marginLeft: "5px" }}>{user?.subscription_plan || "Free"}</span>
+        </p>
       </div>
 
-      <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px", marginBottom: "30px" }}>
-        <div className="stat-card" style={{ padding: "20px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", borderRadius: "8px", background: "white" }}>
+      <div className="stats-grid">
+        <div className="stat-card">
           <h3>Total Projects</h3>
-          <p style={{ fontSize: "24px", fontWeight: "bold" }}>{stats.totalProjects}</p>
+          <p>{stats.totalProjects}</p>
         </div>
-        <div className="stat-card" style={{ padding: "20px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", borderRadius: "8px", background: "white" }}>
+        <div className="stat-card">
           <h3>Total Tasks</h3>
-          <p style={{ fontSize: "24px", fontWeight: "bold" }}>{stats.totalTasks}</p>
+          <p>{stats.totalTasks}</p>
         </div>
-        <div className="stat-card" style={{ padding: "20px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", borderRadius: "8px", background: "white" }}>
-          <h3>Total Users</h3>
-          <p style={{ fontSize: "24px", fontWeight: "bold" }}>{stats.totalUsers}</p>
+        <div className="stat-card">
+          <h3>Team Members</h3>
+          <p>{stats.totalUsers}</p>
         </div>
       </div>
 
-      <div className="recent-projects">
-        <h3>Recent Projects</h3>
+      <div className="section">
+        <div className="page-header">
+          <h2>Recent Projects</h2>
+          {isTenantAdmin() && (
+            <div>
+              <button className="btn-secondary" onClick={() => navigate("/projects")} style={{ marginRight: "10px" }}>Manage Projects</button>
+              <button className="btn-secondary" onClick={() => navigate("/users")}>Manage Users</button>
+            </div>
+          )}
+        </div>
+
         {recentProjects.length > 0 ? (
-          <div style={{ display: "grid", gap: "10px" }}>
+          <div style={{ display: "grid", gap: "15px" }}>
             {recentProjects.map((proj) => (
-              <div key={proj.id} style={{ padding: "15px", border: "1px solid #eee", borderRadius: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div key={proj.id} style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #e5e7eb" }}>
                 <div>
-                  <strong>{proj.name}</strong>
-                  <span style={{ marginLeft: "10px", padding: "2px 8px", borderRadius: "12px", background: "#e3f2fd", fontSize: "0.8em" }}>{proj.status}</span>
+                  <strong style={{ fontSize: "1.1rem", display: "block" }}>{proj.name}</strong>
+                  <span style={{ fontSize: "0.85rem", color: "#6b7280", background: "#f3f4f6", padding: "2px 8px", borderRadius: "12px" }}>{proj.status}</span>
                 </div>
-                <button onClick={() => navigate(`/projects/${proj.id}`)} style={{ padding: "5px 10px", cursor: "pointer" }}>View</button>
+                <button className="btn-sm" onClick={() => navigate(`/projects/${proj.id}`)}>View Dashboard</button>
               </div>
             ))}
           </div>
         ) : (
-          <p>No projects found.</p>
-        )}
-      </div>
-
-      <div style={{ marginTop: "30px" }}>
-        {isTenantAdmin() && (
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button onClick={() => navigate("/users")} style={{ padding: "10px 20px", cursor: "pointer" }}>Manage Users</button>
-            <button onClick={() => navigate("/projects")} style={{ padding: "10px 20px", cursor: "pointer" }}>Manage Projects</button>
+          <div style={{ padding: "40px", textAlign: "center", color: "#6b7280", background: "white", borderRadius: "8px" }}>
+            No projects found. Create one to get started.
           </div>
         )}
       </div>

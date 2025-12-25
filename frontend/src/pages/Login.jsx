@@ -54,41 +54,50 @@ function Login() {
 
   return (
     <div className="container">
-      <h2>Login</h2>
+      <h2>Welcome Back</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <div className="error">{error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          onChange={handleChange}
-          required
-        />
+        <div className="form-group">
+          <label>Email Address</label>
+          <input
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          onChange={handleChange}
-          required
-        />
+        <div className="form-group">
+          <label>Password</label>
+          <input
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-        <input
-          name="tenantSubdomain"
-          placeholder="Tenant Subdomain"
-          onChange={handleChange}
-          required
-        />
+        <div className="form-group">
+          <label>Organization Subdomain</label>
+          <input
+            name="tenantSubdomain"
+            placeholder="e.g. acme"
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         <button disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Logging in..." : "Sign In"}
         </button>
       </form>
 
       <p>
-        New tenant? <Link to="/register">Register here</Link>
+        Don't have an account? <Link to="/register">Signup</Link>
       </p>
     </div>
   );

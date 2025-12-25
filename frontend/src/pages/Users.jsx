@@ -76,67 +76,99 @@ function Users() {
   };
 
   return (
-    <div>
-      <h2>Users</h2>
+    <div className="dashboard-container">
+      <div className="page-header">
+        <h2>Team Members</h2>
+        <button className="btn-secondary" onClick={() => window.history.back()}>&larr; Back</button>
+      </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <div className="error">{error}</div>}
 
       {/* ================= ADD USER FORM ================= */}
       {isTenantAdmin() && (
-        <form onSubmit={handleAddUser} style={{ marginBottom: "20px" }}>
-          <h4>Add User</h4>
-
-          <input
-            placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
-
-          <input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="user">User</option>
-            <option value="tenant_admin">Tenant Admin</option>
-          </select>
-
-          <button type="submit">Add User</button>
-        </form>
+        <div className="inline-form">
+          <h4 style={{ marginBottom: "15px" }}>Add New Member</h4>
+          <form onSubmit={handleAddUser} style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "flex-end" }}>
+            <div style={{ flex: 1, minWidth: "200px" }}>
+              <label>Full Name</label>
+              <input
+                placeholder="John Doe"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
+            <div style={{ flex: 1, minWidth: "200px" }}>
+              <label>Email Address</label>
+              <input
+                placeholder="john@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div style={{ flex: 0.5, minWidth: "150px" }}>
+              <label>Role</label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", background: "#f9fafb" }}
+              >
+                <option value="user">User</option>
+                <option value="tenant_admin">Admin</option>
+              </select>
+            </div>
+            <div style={{ paddingBottom: "15px" }}>
+              <button type="submit" style={{ width: "auto" }}>+ Add</button>
+            </div>
+          </form>
+        </div>
       )}
 
       {/* ================= USERS TABLE ================= */}
       {users.length === 0 ? (
-        <p>No users found</p>
+        <div style={{ padding: "40px", textAlign: "center", color: "#6b7280", background: "white", borderRadius: "8px" }}>
+          No users found.
+        </div>
       ) : (
-        <table border="1" cellPadding="8" width="100%">
+        <table>
           <thead>
             <tr>
               <th>Full Name</th>
               <th>Email</th>
               <th>Role</th>
               <th>Status</th>
-              {isTenantAdmin() && <th>Action</th>}
+              {isTenantAdmin() && <th style={{ textAlign: "right" }}>Action</th>}
             </tr>
           </thead>
 
           <tbody>
             {users.map((u) => (
               <tr key={u.id}>
-                <td>{u.full_name}</td>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td>{u.is_active ? "Active" : "Inactive"}</td>
+                <td style={{ fontWeight: "500" }}>{u.full_name}</td>
+                <td style={{ color: "var(--text-muted)" }}>{u.email}</td>
+                <td>
+                  <span style={{
+                    fontSize: "0.8rem",
+                    padding: "2px 8px",
+                    borderRadius: "10px",
+                    background: u.role === 'tenant_admin' ? "#e0e7ff" : "#f3f4f6",
+                    color: u.role === 'tenant_admin' ? "#4338ca" : "#374151"
+                  }}>
+                    {u.role === 'tenant_admin' ? 'Admin' : 'User'}
+                  </span>
+                </td>
+                <td>
+                  <span style={{ color: u.is_active ? "#059669" : "#dc2626", fontWeight: "500", fontSize: "0.9rem" }}>
+                    {u.is_active ? "● Active" : "● Inactive"}
+                  </span>
+                </td>
 
                 {isTenantAdmin() && (
-                  <td>
+                  <td style={{ textAlign: "right" }}>
                     {user.id !== u.id && (
-                      <button onClick={() => handleDelete(u.id)}>
-                        Delete
+                      <button className="btn-sm btn-danger" onClick={() => handleDelete(u.id)}>
+                        Remove
                       </button>
                     )}
                   </td>

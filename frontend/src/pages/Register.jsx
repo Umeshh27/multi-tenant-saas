@@ -55,27 +55,56 @@ function Register() {
   };
 
   return (
-    <div className="container">
-      <h2>Register Tenant</h2>
+    <div className="container register">
+      <h2>Create Your Account</h2>
 
-      {error && <p className="error">{error}</p>}
+      {error && <div className="error">{error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <input name="tenantName" placeholder="Organization Name" onChange={handleChange} required />
-        <input name="subdomain" placeholder="Subdomain" onChange={handleChange} required />
-        <input name="adminEmail" type="email" placeholder="Admin Email" onChange={handleChange} required />
-        <input name="adminFullName" placeholder="Admin Full Name" onChange={handleChange} required />
-        <input name="adminPassword" type="password" minLength={8} maxLength={20} placeholder="Password" onChange={handleChange} required />
-        <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} required />
+        <div className="form-group">
+          <label>Organization Name</label>
+          <input name="tenantName" placeholder="e.g. Acme Corp" onChange={handleChange} required />
+        </div>
 
-        <label>
-          <input type="checkbox" onChange={(e) => setAcceptTerms(e.target.checked)} /> I accept Terms
-        </label>
+        <div className="form-group">
+          <label>Subdomain (Workspace URL)</label>
+          <input name="subdomain" placeholder="acme" onChange={handleChange} required />
+          <small style={{ marginTop: "-5px", color: "#6b7280", fontSize: "0.8rem" }}>Your site will be: {form.subdomain || "your-company"}.saas.com</small>
+        </div>
+
+        <div className="form-group">
+          <label>Admin Name</label>
+          <input name="adminFullName" placeholder="John Doe" onChange={handleChange} required />
+        </div>
+
+        <div className="form-group">
+          <label>Admin Email</label>
+          <input name="adminEmail" type="email" placeholder="john@acme.com" onChange={handleChange} required />
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <input name="adminPassword" type="password" minLength={8} maxLength={20} placeholder="Create a strong password" onChange={handleChange} required />
+        </div>
+
+        <div className="form-group">
+          <label>Confirm Password</label>
+          <input name="confirmPassword" type="password" placeholder="Repeat password" onChange={handleChange} required />
+        </div>
+
+        <div className="checkbox-group">
+          <input type="checkbox" id="terms" onChange={(e) => setAcceptTerms(e.target.checked)} />
+          <label htmlFor="terms" style={{ cursor: "pointer" }}>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+        </div>
 
         <button disabled={loading}>
-          {loading ? "Registering..." : "Register"}
+          {loading ? "Creating Account..." : "Create Account"}
         </button>
       </form>
+
+      <p>
+        Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); navigate("/login"); }}>Sign in</a>
+      </p>
     </div>
   );
 }

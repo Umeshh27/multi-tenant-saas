@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
 
 function Projects() {
   const { loading, isTenantAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState("");
@@ -20,10 +22,12 @@ function Projects() {
     api
       .get("/projects")
       .then((res) => {
-        setProjects(res.data.data.projects || []);
+        const data = res.data?.data?.projects;
+        setProjects(Array.isArray(data) ? data : []);
       })
       .catch(() => {
         setError("Failed to load projects");
+        setProjects([]);
       });
   }, [loading]);
 
@@ -110,7 +114,7 @@ function Projects() {
               <th>Description</th>
               <th>Status</th>
               <th>Created At</th>
-              {isTenantAdmin() && <th>Action</th>}
+              <th>Actions</th>
             </tr>
           </thead>
 
@@ -124,15 +128,28 @@ function Projects() {
                   {new Date(project.created_at).toLocaleDateString()}
                 </td>
 
-                {isTenantAdmin() && (
-                  <td>
-                    <button
-                      onClick={() => handleDeleteProject(project.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                )}
+                <td>
+                  <button
+                    onClick={() =>
+                      navigate(`/projects/${project.id}`)
+                    }
+                  >
+                    View Tasks
+                  </button>
+
+                  {isTenantAdmin() && (
+                    <>
+                      &nbsp;
+                      <button
+                        onClick={() =>
+                          handleDeleteProject(project.id)
+                        }
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

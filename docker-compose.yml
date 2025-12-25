@@ -45,16 +45,16 @@ services:
       timeout: 5s
       retries: 5
 
-  # frontend:
-  #   build: ./frontend
-  #   container_name: frontend
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     REACT_APP_API_URL: http://backend:5000/api
-  #   depends_on:
-  #     backend:
-  #       condition: service_healthy
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://backend:5000/api
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   db_data:

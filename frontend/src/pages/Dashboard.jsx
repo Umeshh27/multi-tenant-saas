@@ -130,8 +130,10 @@ function Dashboard() {
             {recentProjects.map((proj) => (
               <div key={proj.id} style={{ background: "var(--card-bg)", padding: "25px", borderRadius: "12px", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid var(--border-color)" }}>
                 <div>
-                  <strong style={{ fontSize: "1.2rem", display: "block", color: "var(--text-main)", marginBottom: "4px" }}>{proj.name}</strong>
-                  <span style={{ fontSize: "0.80rem", color: "var(--text-muted)", background: "rgba(255,255,255,0.05)", padding: "4px 10px", borderRadius: "20px" }}>{proj.status}</span>
+                  <strong style={{ fontSize: "1.1rem", display: "block", color: "var(--text-main)" }}>{proj.name}</strong>
+                  <span style={{ fontSize: "0.85rem", color: proj.status === 'active' ? "#10b981" : "#a8a29e", fontWeight: "500", marginTop: "4px", display: "inline-block" }}>
+                    ● {proj.status.charAt(0).toUpperCase() + proj.status.slice(1)}
+                  </span>
                 </div>
                 <button className="btn-secondary btn-sm" onClick={() => navigate(`/projects/${proj.id}`)}>
                   View Board <ArrowRight size={14} style={{ marginLeft: "5px" }} />

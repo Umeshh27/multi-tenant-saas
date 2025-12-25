@@ -39,6 +39,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    volumes:
+      - ./database:/app/database
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/api/health"]
       interval: 10s

@@ -140,8 +140,8 @@ function Projects() {
                 <td style={{ fontWeight: "600", color: "var(--text-main)" }}>{project.name}</td>
                 <td style={{ color: "var(--text-muted)" }}>{project.description || "-"}</td>
                 <td>
-                  <span style={{ fontSize: "0.80rem", color: "var(--text-muted)", background: "rgba(255,255,255,0.05)", padding: "4px 10px", borderRadius: "20px" }}>
-                    {project.status}
+                  <span style={{ fontSize: "0.9rem", color: project.status === 'active' ? "#10b981" : "#a8a29e", fontWeight: "500" }}>
+                    ● {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                   </span>
                 </td>
                 <td style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>

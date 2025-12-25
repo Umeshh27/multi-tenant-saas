@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
+import { UserPlus, Trash2, ArrowLeft } from "lucide-react";
 
 function Users() {
   const { user, loading, isTenantAdmin } = useAuth();
@@ -78,8 +79,13 @@ function Users() {
   return (
     <div className="dashboard-container">
       <div className="page-header">
-        <h2>Team Members</h2>
-        <button className="btn-secondary" onClick={() => window.history.back()}>&larr; Back</button>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <UserPlus size={28} className="text-muted" color="var(--text-muted)" />
+          <h2 style={{ fontSize: "1.2rem", color: "var(--text-muted)", margin: 0 }}>Team Members</h2>
+        </div>
+        <button className="btn-secondary btn-sm" onClick={() => window.history.back()}>
+          <ArrowLeft size={16} style={{ marginRight: "5px" }} /> Back
+        </button>
       </div>
 
       {error && <div className="error">{error}</div>}
@@ -87,7 +93,7 @@ function Users() {
       {/* ================= ADD USER FORM ================= */}
       {isTenantAdmin() && (
         <div className="inline-form">
-          <h4 style={{ marginBottom: "15px" }}>Add New Member</h4>
+          <h4 style={{ marginBottom: "15px", color: "var(--text-main)" }}>Add New Member</h4>
           <form onSubmit={handleAddUser} style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "flex-end" }}>
             <div style={{ flex: 1, minWidth: "200px" }}>
               <label>Full Name</label>
@@ -112,14 +118,13 @@ function Users() {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", background: "#f9fafb" }}
               >
                 <option value="user">User</option>
                 <option value="tenant_admin">Admin</option>
               </select>
             </div>
-            <div style={{ paddingBottom: "15px" }}>
-              <button type="submit" style={{ width: "auto" }}>+ Add</button>
+            <div style={{ paddingBottom: "2px" }}>
+              <button type="submit" style={{ width: "auto", height: "42px" }}>+ Add</button>
             </div>
           </form>
         </div>
@@ -127,7 +132,7 @@ function Users() {
 
       {/* ================= USERS TABLE ================= */}
       {users.length === 0 ? (
-        <div style={{ padding: "40px", textAlign: "center", color: "#6b7280", background: "white", borderRadius: "8px" }}>
+        <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)", background: "var(--card-bg)", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
           No users found.
         </div>
       ) : (
@@ -145,21 +150,22 @@ function Users() {
           <tbody>
             {users.map((u) => (
               <tr key={u.id}>
-                <td style={{ fontWeight: "500" }}>{u.full_name}</td>
+                <td style={{ fontWeight: "500", color: "var(--text-main)" }}>{u.full_name}</td>
                 <td style={{ color: "var(--text-muted)" }}>{u.email}</td>
                 <td>
                   <span style={{
                     fontSize: "0.8rem",
                     padding: "2px 8px",
                     borderRadius: "10px",
-                    background: u.role === 'tenant_admin' ? "#e0e7ff" : "#f3f4f6",
-                    color: u.role === 'tenant_admin' ? "#4338ca" : "#374151"
+                    background: u.role === 'tenant_admin' ? "rgba(99, 102, 241, 0.1)" : "rgba(255, 255, 255, 0.05)",
+                    color: u.role === 'tenant_admin' ? "#818cf8" : "var(--text-muted)",
+                    border: u.role === 'tenant_admin' ? "1px solid rgba(99, 102, 241, 0.2)" : "1px solid var(--border-color)"
                   }}>
                     {u.role === 'tenant_admin' ? 'Admin' : 'User'}
                   </span>
                 </td>
                 <td>
-                  <span style={{ color: u.is_active ? "#059669" : "#dc2626", fontWeight: "500", fontSize: "0.9rem" }}>
+                  <span style={{ color: u.is_active ? "#10b981" : "#ef4444", fontWeight: "500", fontSize: "0.9rem" }}>
                     {u.is_active ? "● Active" : "● Inactive"}
                   </span>
                 </td>
@@ -167,8 +173,8 @@ function Users() {
                 {isTenantAdmin() && (
                   <td style={{ textAlign: "right" }}>
                     {user.id !== u.id && (
-                      <button className="btn-sm btn-danger" onClick={() => handleDelete(u.id)}>
-                        Remove
+                      <button className="btn-sm btn-danger" onClick={() => handleDelete(u.id)} title="Remove User">
+                        <Trash2 size={14} />
                       </button>
                     )}
                   </td>

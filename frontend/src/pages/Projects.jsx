@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
+import { FolderPlus, Trash2, ArrowRight } from "lucide-react";
 
 function Projects() {
   const { loading, isTenantAdmin } = useAuth();
@@ -71,83 +72,99 @@ function Projects() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Projects</h2>
+    <div className="dashboard-container">
+      <div className="page-header">
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <FolderPlus size={28} className="text-muted" color="var(--text-muted)" />
+          <h2 style={{ fontSize: "1.2rem", color: "var(--text-muted)", margin: 0 }}>Projects</h2>
+        </div>
+        <button className="btn-secondary btn-sm" onClick={() => window.history.back()}>&larr; Back</button>
+      </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
 
       {/* ================= ADD PROJECT ================= */}
       {isTenantAdmin() && (
-        <form onSubmit={handleAddProject} style={{ marginBottom: "20px" }}>
-          <h4>Create Project</h4>
+        <div className="inline-form">
+          <h4 style={{ marginBottom: "15px", color: "var(--text-main)" }}>Create New Project</h4>
+          <form onSubmit={handleAddProject} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+            <div className="form-group">
+              <label>Project Name</label>
+              <input
+                type="text"
+                placeholder="e.g. Website Redesign"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
 
-          <input
-            type="text"
-            placeholder="Project Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+            <div className="form-group">
+              <label>Description (Optional)</label>
+              <textarea
+                placeholder="Brief details about the project..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                style={{ resize: "vertical" }}
+              />
+            </div>
 
-          <br /><br />
-
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <br /><br />
-
-          <button type="submit">Add Project</button>
-        </form>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button type="submit" style={{ width: "auto" }}>+ Create Project</button>
+            </div>
+          </form>
+        </div>
       )}
 
       {/* ================= PROJECT LIST ================= */}
       {projects.length === 0 ? (
-        <p>No projects found</p>
+        <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)", background: "var(--card-bg)", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+          No projects found.
+        </div>
       ) : (
-        <table border="1" cellPadding="8" width="100%">
+        <table>
           <thead>
             <tr>
               <th>Name</th>
               <th>Description</th>
               <th>Status</th>
               <th>Created At</th>
-              <th>Actions</th>
+              <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {projects.map((project) => (
               <tr key={project.id}>
-                <td>{project.name}</td>
-                <td>{project.description || "-"}</td>
-                <td>{project.status}</td>
+                <td style={{ fontWeight: "600", color: "var(--text-main)" }}>{project.name}</td>
+                <td style={{ color: "var(--text-muted)" }}>{project.description || "-"}</td>
                 <td>
+                  <span style={{ fontSize: "0.80rem", color: "var(--text-muted)", background: "rgba(255,255,255,0.05)", padding: "4px 10px", borderRadius: "20px" }}>
+                    {project.status}
+                  </span>
+                </td>
+                <td style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
                   {new Date(project.created_at).toLocaleDateString()}
                 </td>
 
-                <td>
+                <td style={{ textAlign: "right" }}>
                   <button
-                    onClick={() =>
-                      navigate(`/projects/${project.id}`)
-                    }
+                    className="btn-secondary btn-sm"
+                    onClick={() => navigate(`/projects/${project.id}`)}
+                    style={{ marginRight: "8px" }}
                   >
-                    View Tasks
+                    View <ArrowRight size={14} style={{ marginLeft: "4px" }} />
                   </button>
 
                   {isTenantAdmin() && (
-                    <>
-                      &nbsp;
-                      <button
-                        onClick={() =>
-                          handleDeleteProject(project.id)
-                        }
-                      >
-                        Delete
-                      </button>
-                    </>
+                    <button
+                      className="btn-danger btn-sm"
+                      onClick={() => handleDeleteProject(project.id)}
+                      title="Delete Project"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   )}
                 </td>
               </tr>

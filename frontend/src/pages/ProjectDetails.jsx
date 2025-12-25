@@ -24,6 +24,7 @@ function ProjectDetails() {
   /* ---------- ADD TASK ---------- */
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("medium");
+  const [assignedTo, setAssignedTo] = useState("");
 
   /* ---------- EDIT MODAL ---------- */
   const [showEdit, setShowEdit] = useState(false);
@@ -78,9 +79,11 @@ function ProjectDetails() {
       await api.post(`/projects/${projectId}/tasks`, {
         title,
         priority,
+        assignedTo: assignedTo || null
       });
       setTitle("");
       setPriority("medium");
+      setAssignedTo("");
       await fetchTasks();
     } catch {
       setError("Failed to create task");
@@ -216,6 +219,21 @@ function ProjectDetails() {
             </select>
           </div>
 
+          <div className="form-group">
+            <label>Assigned To</label>
+            <select
+              value={assignedTo}
+              onChange={(e) => setAssignedTo(e.target.value)}
+            >
+              <option value="">Unassigned</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.fullName}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button type="submit" style={{ height: "42px", width: "auto" }}>
               <Plus size={18} style={{ marginRight: "5px" }} /> Add Task
@@ -260,7 +278,7 @@ function ProjectDetails() {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.85rem", color: "var(--text-muted)", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)", marginBottom: "12px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         <User size={14} />
-                        {task.assigned_user?.fullName || "Unassigned"}
+                        {task.assigned_name || "Unassigned"}
                       </div>
                     </div>
 

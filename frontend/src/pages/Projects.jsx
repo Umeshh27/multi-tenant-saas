@@ -11,31 +11,25 @@ function Projects() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  /* =========================
+  /* ===============================
      FETCH PROJECTS
-  ========================= */
+  =============================== */
   useEffect(() => {
     if (loading) return;
 
     api
       .get("/projects")
       .then((res) => {
-        const data = res.data?.data;
-        if (Array.isArray(data?.projects)) {
-          setProjects(data.projects);
-        } else {
-          setProjects([]);
-        }
+        setProjects(res.data.data.projects || []);
       })
       .catch(() => {
         setError("Failed to load projects");
-        setProjects([]);
       });
   }, [loading]);
 
-  /* =========================
-     ADD PROJECT (FIXED)
-  ========================= */
+  /* ===============================
+     ADD PROJECT
+  =============================== */
   const handleAddProject = async (e) => {
     e.preventDefault();
     setError("");
@@ -46,52 +40,52 @@ function Projects() {
         description,
       });
 
-      const newProject = res.data?.data;
-
-      if (newProject) {
-        setProjects((prev) => [...prev, newProject]);
-      }
-
+      setProjects((prev) => [...prev, res.data.data]);
       setName("");
       setDescription("");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create project");
+      if (err.response?.status === 403) {
+        setError("Project limit reached for your plan");
+      } else {
+        setError("Failed to create project");
+      }
     }
   };
 
-  /* =========================
-     DELETE PROJECT (FIXED)
-  ========================= */
+  /* ===============================
+     DELETE PROJECT
+  =============================== */
   const handleDeleteProject = async (projectId) => {
     if (!window.confirm("Delete this project?")) return;
 
     try {
       await api.delete(`/projects/${projectId}`);
-
-      setProjects((prev) =>
-        prev.filter((project) => project.id !== projectId)
-      );
-    } catch (err) {
-      alert(err.response?.data?.message || "Delete failed");
+      setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    } catch {
+      alert("Failed to delete project");
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Projects</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
+      {/* ================= ADD PROJECT ================= */}
       {isTenantAdmin() && (
-        <form onSubmit={handleAddProject}>
+        <form onSubmit={handleAddProject} style={{ marginBottom: "20px" }}>
           <h4>Create Project</h4>
 
           <input
+            type="text"
             placeholder="Project Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
+
+          <br /><br />
 
           <textarea
             placeholder="Description"
@@ -99,35 +93,42 @@ function Projects() {
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          <button type="submit">Create</button>
+          <br /><br />
+
+          <button type="submit">Add Project</button>
         </form>
       )}
 
-      <hr />
-
+      {/* ================= PROJECT LIST ================= */}
       {projects.length === 0 ? (
         <p>No projects found</p>
       ) : (
-        <table border="1" cellPadding="8">
+        <table border="1" cellPadding="8" width="100%">
           <thead>
             <tr>
               <th>Name</th>
               <th>Description</th>
               <th>Status</th>
+              <th>Created At</th>
               {isTenantAdmin() && <th>Action</th>}
             </tr>
           </thead>
 
           <tbody>
-            {projects.map((p) => (
-              <tr key={p.id}>
-                <td>{p.name}</td>
-                <td>{p.description || "-"}</td>
-                <td>{p.status}</td>
+            {projects.map((project) => (
+              <tr key={project.id}>
+                <td>{project.name}</td>
+                <td>{project.description || "-"}</td>
+                <td>{project.status}</td>
+                <td>
+                  {new Date(project.created_at).toLocaleDateString()}
+                </td>
 
                 {isTenantAdmin() && (
                   <td>
-                    <button onClick={() => handleDeleteProject(p.id)}>
+                    <button
+                      onClick={() => handleDeleteProject(project.id)}
+                    >
                       Delete
                     </button>
                   </td>

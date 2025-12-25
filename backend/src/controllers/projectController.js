@@ -84,17 +84,23 @@ export const listProjects = async (req, res) => {
     }
 
     const projectsResult = await pool.query(
-      `SELECT p.id, p.name, p.description, p.status, p.created_at,
-              u.id AS creator_id, u.full_name AS creator_name,
-              (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id) AS task_count,
-              (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id AND t.status = 'completed') AS completed_task_count
-       FROM projects p
-       JOIN users u ON p.created_by = u.id
-       WHERE ${conditions.join(" AND ")}
-       ORDER BY p.created_at DESC
-       LIMIT $${index} OFFSET $${index + 1}`,
-      [...values, limit, offset]
-    );
+  `SELECT 
+      p.id,
+      p.name,
+      p.description,
+      p.status,
+      p.created_at,
+      u.full_name AS creator_name,
+      COALESCE(
+        (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id), 0
+      ) AS task_count
+   FROM projects p
+   LEFT JOIN users u ON p.created_by = u.id
+   WHERE p.tenant_id = $1
+   ORDER BY p.created_at DESC`,
+  [tenantId]
+);
+
 
     const countResult = await pool.query(
       "SELECT COUNT(*) FROM projects WHERE tenant_id = $1",

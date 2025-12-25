@@ -228,7 +228,7 @@ function ProjectDetails() {
               <option value="">Unassigned</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>
-                  {u.fullName}
+                  {u.full_name}
                 </option>
               ))}
             </select>
@@ -372,7 +372,7 @@ function ProjectDetails() {
                 <select value={editAssignedTo} onChange={e => setEditAssignedTo(e.target.value)}>
                   <option value="">Unassigned</option>
                   {users.map(u => (
-                    <option key={u.id} value={u.id}>{u.fullName}</option>
+                    <option key={u.id} value={u.id}>{u.full_name}</option>
                   ))}
                 </select>
               </div>

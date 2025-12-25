@@ -119,17 +119,17 @@ function Dashboard() {
         {recentProjects.length > 0 ? (
           <div style={{ display: "grid", gap: "15px" }}>
             {recentProjects.map((proj) => (
-              <div key={proj.id} style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid #e5e7eb" }}>
+              <div key={proj.id} style={{ background: "var(--card-bg)", padding: "20px", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", border: "1px solid var(--border-color)" }}>
                 <div>
-                  <strong style={{ fontSize: "1.1rem", display: "block" }}>{proj.name}</strong>
-                  <span style={{ fontSize: "0.85rem", color: "#6b7280", background: "#f3f4f6", padding: "2px 8px", borderRadius: "12px" }}>{proj.status}</span>
+                  <strong style={{ fontSize: "1.1rem", display: "block", color: "var(--text-main)" }}>{proj.name}</strong>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)", background: "rgba(255,255,255,0.05)", padding: "2px 8px", borderRadius: "12px", marginTop: "4px", display: "inline-block" }}>{proj.status}</span>
                 </div>
-                <button className="btn-sm" onClick={() => navigate(`/projects/${proj.id}`)}>View Dashboard</button>
+                <button className="btn-sm btn-secondary" onClick={() => navigate(`/projects/${proj.id}`)}>View Dashboard</button>
               </div>
             ))}
           </div>
         ) : (
-          <div style={{ padding: "40px", textAlign: "center", color: "#6b7280", background: "white", borderRadius: "8px" }}>
+          <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)", background: "var(--card-bg)", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
             No projects found. Create one to get started.
           </div>
         )}

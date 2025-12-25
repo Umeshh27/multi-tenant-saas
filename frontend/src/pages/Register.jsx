@@ -97,7 +97,7 @@ function Register() {
           <label htmlFor="terms" style={{ cursor: "pointer" }}>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
         </div>
 
-        <button disabled={loading}>
+        <button disabled={loading} className="btn-full">
           {loading ? "Creating Account..." : "Create Account"}
         </button>
       </form>

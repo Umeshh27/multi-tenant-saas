@@ -1,0 +1,19 @@
+node_modules
+dist
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sw?
+.DS_Store

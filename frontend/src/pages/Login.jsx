@@ -64,7 +64,7 @@ function Login() {
           <input
             name="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder="Enter your email"
             onChange={handleChange}
             required
           />
@@ -85,7 +85,7 @@ function Login() {
           <label>Organization Subdomain</label>
           <input
             name="tenantSubdomain"
-            placeholder="e.g. acme"
+            placeholder="Enter subdomain"
             onChange={handleChange}
             required
           />

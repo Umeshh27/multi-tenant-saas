@@ -98,7 +98,7 @@ function Users() {
             <div style={{ flex: 1, minWidth: "200px" }}>
               <label>Full Name</label>
               <input
-                placeholder="John Doe"
+                placeholder="Enter Full Name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
@@ -107,7 +107,7 @@ function Users() {
             <div style={{ flex: 1, minWidth: "200px" }}>
               <label>Email Address</label>
               <input
-                placeholder="john@example.com"
+                placeholder="Enter Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

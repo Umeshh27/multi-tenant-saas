@@ -63,12 +63,12 @@ function Register() {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Organization Name</label>
-          <input name="tenantName" placeholder="Enter Organization Name" onChange={handleChange} required />
+          <input name="tenantName" placeholder="e.g. Acme Corp" onChange={handleChange} required />
         </div>
 
         <div className="form-group">
           <label>Subdomain (Workspace URL)</label>
-          <input name="subdomain" placeholder="Enter Subdomain" onChange={handleChange} required />
+          <input name="subdomain" placeholder="acme" onChange={handleChange} required />
           <small style={{ marginTop: "-5px", color: "#6b7280", fontSize: "0.8rem" }}>Your site will be: {form.subdomain || "your-company"}.saas.com</small>
         </div>
 
